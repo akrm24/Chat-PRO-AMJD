@@ -1,0 +1,236 @@
+/* --- إعادة تعيين أساسية وأنماط عامة --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Cairo', sans-serif;
+    background-color: #121212; /* أسود غامق */
+    color: #e0e0e0; /* لون نص فاتح */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    direction: rtl; /* دعم اللغة العربية */
+}
+
+/* --- حاوية الدردشة الرئيسية --- */
+.chat-container {
+    width: 100%;
+    max-width: 700px;
+    height: 85vh;
+    max-height: 800px;
+    background: rgba(18, 18, 18, 0.6); /* خلفية شفافة قليلاً للحاوية */
+    border-radius: 15px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* لإخفاء أي تجاوز */
+
+    /* Glassmorphism Effect */
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+h1 {
+    text-align: center;
+    color: #f5f5f5;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+/* --- منطقة إدخال الاسم --- */
+.name-input-area {
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.name-input-area label {
+    white-space: nowrap; /* لمنع كسر السطر */
+    color: #cccccc;
+}
+
+.name-input-area input[type="text"] {
+    flex-grow: 1;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Cairo', sans-serif;
+}
+
+/* --- صندوق عرض الرسائل --- */
+#chatbox {
+    flex-grow: 1; /* يأخذ المساحة المتبقية */
+    overflow-y: auto; /* تمكين التمرير العمودي */
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 10px;
+
+    /* تخصيص شريط التمرير (اختياري) */
+    scrollbar-width: thin;
+    scrollbar-color: #8B0000 rgba(255, 255, 255, 0.1);
+}
+
+/* تخصيص شريط التمرير لمتصفحات WebKit (Chrome, Safari) */
+#chatbox::-webkit-scrollbar {
+    width: 8px;
+}
+
+#chatbox::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+#chatbox::-webkit-scrollbar-thumb {
+    background-color: #8B0000; /* أحمر غامق */
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+#chatbox::-webkit-scrollbar-thumb:hover {
+    background-color: #a52a2a; /* أفتح قليلاً عند التمرير */
+}
+
+/* --- نمط الرسائل الفردية --- */
+.message {
+    background: rgba(40, 40, 40, 0.7); /* خلفية أغمق قليلاً للرسائل */
+    padding: 10px 15px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    border-left: 4px solid #8B0000; /* شريط أحمر غامق مميز */
+    max-width: 90%; /* تحديد عرض أقصى للرسالة */
+    word-wrap: break-word; /* كسر الكلمات الطويلة */
+    clear: both; /* يضمن عدم التداخل إذا أضفنا اتجاهات مختلفة لاحقًا */
+}
+
+.message .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+    font-size: 0.8em;
+    color: #a0a0a0;
+}
+
+.message .sender {
+    font-weight: bold;
+    color: #e67e8a; /* لون مختلف للمرسل لتمييزه */
+}
+
+.message .time {
+    font-style: italic;
+}
+
+.message .text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #dcdcdc;
+}
+
+/* رسائل النظام (للتحميل والأخطاء) */
+.system-message {
+    text-align: center;
+    color: #aaa;
+    font-style: italic;
+    padding: 10px;
+}
+.system-message.error {
+    color: #ff6b6b; /* لون أحمر للأخطاء */
+    font-weight: bold;
+}
+
+
+/* --- منطقة إدخال الرسالة --- */
+.message-input-area {
+    display: flex;
+    gap: 10px; /* مسافة بين الحقل والزر */
+    padding: 15px;
+    border-radius: 10px;
+}
+
+#messageInput {
+    flex-grow: 1; /* يأخذ معظم المساحة */
+    padding: 12px 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #e0e0e0;
+    font-size: 1rem;
+    font-family: 'Cairo', sans-serif;
+}
+
+#sendButton {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: #8B0000; /* Dark Red */
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    font-family: 'Cairo', sans-serif;
+}
+
+#sendButton:hover {
+    background-color: #a52a2a; /* أفتح قليلاً عند التمرير */
+}
+
+#sendButton:active {
+    background-color: #7a0000; /* أغمق قليلاً عند النقر */
+    transform: scale(0.98);
+}
+
+/* --- تأثير Glassmorphism العام للعناصر --- */
+.glassmorphism {
+    background: rgba(255, 255, 255, 0.08); /* خلفية شفافة خفيفة */
+    backdrop-filter: blur(8px) saturate(120%);
+    -webkit-backdrop-filter: blur(8px) saturate(120%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* --- تحسينات للهواتف (اختياري) --- */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    .chat-container {
+        height: 90vh;
+        padding: 15px;
+    }
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+    .name-input-area, .message-input-area {
+        padding: 10px;
+    }
+    #messageInput, .name-input-area input[type="text"], #sendButton {
+        font-size: 0.9rem;
+        padding: 10px 12px;
+    }
+    #sendButton {
+         padding: 10px 15px;
+    }
+    .message {
+        padding: 8px 12px;
+        margin-bottom: 10px;
+    }
+    .message .text {
+        font-size: 0.9rem;
+    }
+}

@@ -1,236 +1,308 @@
 /* --- إعادة تعيين أساسية وأنماط عامة --- */
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px; /* أساس حجم الخط */
 }
 
 body {
-    font-family: 'Cairo', sans-serif;
-    background-color: #121212; /* أسود غامق */
+    font-family: 'Exo 2', 'Orbitron', sans-serif; /* استخدام الخطوط المستقبلية */
+    background-color: #0a0a1a; /* خلفية داكنة جداً */
     color: #e0e0e0; /* لون نص فاتح */
+    overflow: hidden; /* منع التمرير في الجسم الرئيسي */
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 20px;
-    direction: rtl; /* دعم اللغة العربية */
+    position: relative; /* ضروري لتحديد موضع الخلفية */
+}
+
+/* --- تأثير الزجاج (Glass Morphism) --- */
+.glass-effect {
+    background: rgba(15, 15, 30, 0.4); /* خلفية شبه شفافة داكنة */
+    backdrop-filter: blur(10px) saturate(150%); /* تأثير الضبابية والتشبع */
+    -webkit-backdrop-filter: blur(10px) saturate(150%); /* لدعم Safari */
+    border: 1px solid rgba(255, 0, 50, 0.2); /* حدود نيون خفيفة */
+    border-radius: 15px; /* حواف دائرية */
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2); /* ظل خفيف */
+}
+
+/* --- الخلفية المتحركة (مثال بتدرج لوني متحرك) --- */
+.background-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: linear-gradient(-45deg, #0a0a1a, #1a0a1a, #1a1a3a, #ff0032);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* --- شاشة طلب الاسم --- */
+#name-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 3rem;
+    text-align: center;
+    z-index: 10;
+    display: flex; /* سيتم التحكم به عبر JS */
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 90%;
+    max-width: 400px;
+}
+
+#name-overlay h2 {
+    color: #ff0032; /* لون نيون */
+    margin-bottom: 1rem;
+    font-family: 'Orbitron', sans-serif;
+}
+
+#name-overlay input[type="text"] {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 0, 50, 0.3);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    color: #e0e0e0;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+#name-overlay input[type="text"]::placeholder {
+    color: #aaa;
+}
+
+#name-overlay input[type="text"]:focus {
+    border-color: #ff0032;
+}
+
+#name-overlay button,
+#send-button {
+    background: #ff0032; /* لون الزر نيون */
+    color: #0a0a1a; /* لون النص داكن */
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-size: 1rem;
+}
+
+#name-overlay button:hover,
+#send-button:hover {
+    background: #ff3355; /* لون أفتح عند المرور */
+    transform: scale(1.05); /* تكبير طفيف */
 }
 
 /* --- حاوية الدردشة الرئيسية --- */
-.chat-container {
-    width: 100%;
-    max-width: 700px;
-    height: 85vh;
-    max-height: 800px;
-    background: rgba(18, 18, 18, 0.6); /* خلفية شفافة قليلاً للحاوية */
-    border-radius: 15px;
-    padding: 25px;
+#chat-container {
+    width: 95%;
+    max-width: 800px;
+    height: 90vh; /* ارتفاع كبير ليناسب الشاشة */
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* لإخفاء أي تجاوز */
-
-    /* Glassmorphism Effect */
-    backdrop-filter: blur(12px) saturate(150%);
-    -webkit-backdrop-filter: blur(12px) saturate(150%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    overflow: hidden; /* منع المحتوى من التجاوز */
+    position: relative; /* للسماح بتحديد موضع العناصر الداخلية */
+    border-radius: 15px; /* يتناسق مع تأثير الزجاج */
 }
 
-h1 {
-    text-align: center;
-    color: #f5f5f5;
-    margin-bottom: 20px;
-    font-weight: 700;
+#chat-container.hidden {
+    display: none; /* لإخفاء حاوية الدردشة قبل إدخال الاسم */
 }
 
-/* --- منطقة إدخال الاسم --- */
-.name-input-area {
-    margin-bottom: 15px;
-    padding: 15px;
-    border-radius: 10px;
+/* --- رأس الصفحة --- */
+#chat-container header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 0, 50, 0.2);
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
 }
 
-.name-input-area label {
-    white-space: nowrap; /* لمنع كسر السطر */
-    color: #cccccc;
+#chat-container header h1 {
+    color: #ff0032;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    text-shadow: 0 0 5px #ff0032; /* توهج خفيف */
 }
 
-.name-input-area input[type="text"] {
-    flex-grow: 1;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #e0e0e0;
-    padding: 10px 12px;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-family: 'Cairo', sans-serif;
+#welcome-message {
+    font-size: 0.9rem;
+    color: #ccc;
 }
 
-/* --- صندوق عرض الرسائل --- */
-#chatbox {
-    flex-grow: 1; /* يأخذ المساحة المتبقية */
-    overflow-y: auto; /* تمكين التمرير العمودي */
-    margin-bottom: 15px;
-    padding: 15px;
-    border-radius: 10px;
 
-    /* تخصيص شريط التمرير (اختياري) */
-    scrollbar-width: thin;
-    scrollbar-color: #8B0000 rgba(255, 255, 255, 0.1);
+/* --- منطقة عرض الرسائل --- */
+#chat-box {
+    flex-grow: 1; /* تأخذ المساحة المتبقية */
+    padding: 1rem;
+    overflow-y: auto; /* تفعيل التمرير العمودي عند الحاجة */
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* مسافة بين الرسائل */
 }
 
-/* تخصيص شريط التمرير لمتصفحات WebKit (Chrome, Safari) */
-#chatbox::-webkit-scrollbar {
+/* تخصيص شريط التمرير (للمتصفحات Webkit) */
+#chat-box::-webkit-scrollbar {
     width: 8px;
 }
-
-#chatbox::-webkit-scrollbar-track {
+#chat-box::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
 }
-
-#chatbox::-webkit-scrollbar-thumb {
-    background-color: #8B0000; /* أحمر غامق */
+#chat-box::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 0, 50, 0.5);
     border-radius: 10px;
     border: 2px solid transparent;
     background-clip: content-box;
 }
-
-#chatbox::-webkit-scrollbar-thumb:hover {
-    background-color: #a52a2a; /* أفتح قليلاً عند التمرير */
+#chat-box::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 0, 50, 0.8);
 }
 
-/* --- نمط الرسائل الفردية --- */
+/* --- تنسيق الرسالة الفردية --- */
 .message {
-    background: rgba(40, 40, 40, 0.7); /* خلفية أغمق قليلاً للرسائل */
-    padding: 10px 15px;
-    margin-bottom: 12px;
+    padding: 0.8rem 1.2rem;
     border-radius: 12px;
-    border-left: 4px solid #8B0000; /* شريط أحمر غامق مميز */
-    max-width: 90%; /* تحديد عرض أقصى للرسالة */
-    word-wrap: break-word; /* كسر الكلمات الطويلة */
-    clear: both; /* يضمن عدم التداخل إذا أضفنا اتجاهات مختلفة لاحقًا */
+    max-width: 75%;
+    word-wrap: break-word;
+    animation: slideIn 0.4s ease-out forwards; /* أنيميشن دخول الرسالة */
 }
 
-.message .meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 5px;
-    font-size: 0.8em;
-    color: #a0a0a0;
+/* أنيميشن دخول الرسائل */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px); /* يبدأ من اليسار قليلاً */
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
-.message .sender {
+/* الرسائل المستلمة (الآخرين) */
+.message.received {
+    background: rgba(40, 40, 60, 0.6); /* لون مختلف قليلاً */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(100, 100, 200, 0.2);
+    align-self: flex-start; /* محاذاة لليسار */
+    animation: slideInLeft 0.4s ease-out forwards;
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+
+/* الرسائل المرسلة (المستخدم الحالي) */
+.message.sent {
+    background: rgba(255, 0, 50, 0.3); /* لون نيون خفيف */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 0, 50, 0.4);
+    align-self: flex-end; /* محاذاة لليمين */
+    animation: slideInRight 0.4s ease-out forwards;
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.message-meta {
+    display: block;
+    font-size: 0.75rem;
+    color: #bbb;
+    margin-bottom: 0.3rem;
     font-weight: bold;
-    color: #e67e8a; /* لون مختلف للمرسل لتمييزه */
 }
 
-.message .time {
-    font-style: italic;
+.message-meta .timestamp {
+    font-size: 0.7rem;
+    color: #999;
+    margin-right: 5px; /* مسافة قبل اسم المستخدم */
+    font-weight: normal;
 }
 
-.message .text {
-    font-size: 0.95rem;
+.message-text {
+    font-size: 1rem;
     line-height: 1.5;
-    color: #dcdcdc;
 }
 
-/* رسائل النظام (للتحميل والأخطاء) */
-.system-message {
-    text-align: center;
-    color: #aaa;
-    font-style: italic;
-    padding: 10px;
-}
-.system-message.error {
-    color: #ff6b6b; /* لون أحمر للأخطاء */
-    font-weight: bold;
-}
-
-
-/* --- منطقة إدخال الرسالة --- */
-.message-input-area {
+/* --- منطقة الإدخال والإرسال --- */
+#input-area {
+    padding: 1rem;
+    border-top: 1px solid rgba(255, 0, 50, 0.2);
     display: flex;
-    gap: 10px; /* مسافة بين الحقل والزر */
-    padding: 15px;
-    border-radius: 10px;
+    gap: 1rem; /* مسافة بين الحقل والزر */
 }
 
-#messageInput {
-    flex-grow: 1; /* يأخذ معظم المساحة */
-    padding: 12px 15px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
+#message-input {
+    flex-grow: 1; /* تأخذ المساحة المتبقية */
     background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 0, 50, 0.3);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
     color: #e0e0e0;
     font-size: 1rem;
-    font-family: 'Cairo', sans-serif;
+    outline: none;
+    transition: border-color 0.3s ease;
 }
 
-#sendButton {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    background-color: #8B0000; /* Dark Red */
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s ease, transform 0.1s ease;
-    font-family: 'Cairo', sans-serif;
+#message-input::placeholder {
+    color: #aaa;
 }
 
-#sendButton:hover {
-    background-color: #a52a2a; /* أفتح قليلاً عند التمرير */
+#message-input:focus {
+    border-color: #ff0032;
 }
 
-#sendButton:active {
-    background-color: #7a0000; /* أغمق قليلاً عند النقر */
-    transform: scale(0.98);
+#send-button {
+    flex-shrink: 0; /* منع الزر من التقلص */
 }
 
-/* --- تأثير Glassmorphism العام للعناصر --- */
-.glassmorphism {
-    background: rgba(255, 255, 255, 0.08); /* خلفية شفافة خفيفة */
-    backdrop-filter: blur(8px) saturate(120%);
-    -webkit-backdrop-filter: blur(8px) saturate(120%);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+/* --- أدوات مساعدة --- */
+.hidden {
+    display: none !important; /* لإخفاء العناصر بشكل قاطع */
 }
 
-/* --- تحسينات للهواتف (اختياري) --- */
+/* --- تحسينات للهواتف (مثال بسيط) --- */
 @media (max-width: 600px) {
-    body {
-        padding: 10px;
+    html {
+        font-size: 14px;
     }
-    .chat-container {
-        height: 90vh;
-        padding: 15px;
+    #chat-container {
+        width: 100%;
+        height: 100vh;
+        border-radius: 0;
     }
-    h1 {
-        font-size: 1.5rem;
-        margin-bottom: 15px;
+    #chat-container header h1 {
+       font-size: 1.5rem;
     }
-    .name-input-area, .message-input-area {
-        padding: 10px;
-    }
-    #messageInput, .name-input-area input[type="text"], #sendButton {
-        font-size: 0.9rem;
-        padding: 10px 12px;
-    }
-    #sendButton {
-         padding: 10px 15px;
+     #name-overlay {
+        width: 90%;
     }
     .message {
-        padding: 8px 12px;
-        margin-bottom: 10px;
+        max-width: 85%;
     }
-    .message .text {
-        font-size: 0.9rem;
     }
-}

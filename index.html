@@ -3,156 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AMJD Chat</title>
-    <link rel="stylesheet" href="style.css">
+    <title>AMJD Chat - دردشة المستقبل</title>
+    <!-- Google Fonts (Orbitron أو Exo 2) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="chat-container">
-        <h1>AMJD Chat</h1>
 
-        <div class="name-input-area glassmorphism">
-            <label for="nameInput">اسمك:</label>
-            <input type="text" id="nameInput" placeholder="أدخل اسمك هنا...">
-        </div>
+    <!-- طبقة الخلفية المتحركة (مثال بتدرج لوني) -->
+    <div class="background-overlay"></div>
 
-        <div id="chatbox" class="chatbox glassmorphism">
-            <!-- سيتم تحميل الرسائل هنا -->
-            <p class="system-message">جاري تحميل الرسائل...</p>
-        </div>
-
-        <div class="message-input-area glassmorphism">
-            <input type="text" id="messageInput" placeholder="اكتب رسالتك هنا...">
-            <button id="sendButton">إرسال</button>
-        </div>
+    <!-- شاشة طلب الاسم (تظهر مرة واحدة) -->
+    <div id="name-overlay" class="glass-effect">
+        <h2>أدخل اسمك للمستقبل</h2>
+        <input type="text" id="name-input" placeholder="اسم المستخدم الخاص بك..." required>
+        <button id="name-submit">دخول بوابة الدردشة</button>
     </div>
 
-    <!-- Firebase SDK (استخدم أحدث إصدار متوفر) -->
-    <!-- يجب استبدال هذه الروابط بالإصدارات التي تناسب مشروعك -->
-    <script type="module">
-      // Import the functions you need from the SDKs you need
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"; // استبدل بالإصدار المناسب
-      import { getDatabase, ref, push, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"; // استبدل بالإصدار المناسب
-      // قد لا تحتاج لـ Analytics في هذا المثال البسيط للدردشة
-      // import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+    <!-- حاوية الدردشة الرئيسية -->
+    <div id="chat-container" class="hidden">
+        <header class="glass-effect">
+            <h1>AMJD Chat</h1>
+            <span id="welcome-message"></span>
+        </header>
 
-      // إعداد الاتصال بـ Firebase (استخدم الإعدادات الخاصة بك)
-      // !!! تحذير أمني: لا تضع هذه المعلومات مباشرة في كود الإنتاج !!!
-      const firebaseConfig = {
-        apiKey: "AIzaSyDls7qCYoGj5L37w1nkSkAaaAFe-O1HR_s",
-        authDomain: "chat-amjd.firebaseapp.com",
-        // مهم: يجب إضافة رابط قاعدة البيانات هنا
-        databaseURL: "https://chat-amjd-default-rtdb.firebaseio.com/",
-        projectId: "chat-amjd",
-        storageBucket: "chat-amjd.firebasestorage.app",
-        messagingSenderId: "317055926652",
-        appId: "1:317055926652:web:a00dbe19443dd201d3e4f9",
-        measurementId: "G-3BHG4GGRBW" // اختياري لـ Analytics
-      };
+        <!-- منطقة عرض الرسائل -->
+        <div id="chat-box" class="glass-effect">
+            <!-- الرسائل ستظهر هنا -->
+        </div>
 
-      // تهيئة Firebase
-      const app = initializeApp(firebaseConfig);
-      const database = getDatabase(app);
-      // const analytics = getAnalytics(app); // غير مستخدم حاليًا
+        <!-- منطقة الإدخال والإرسال -->
+        <footer id="input-area" class="glass-effect">
+            <input type="text" id="message-input" placeholder="اكتب رسالتك المستقبلية هنا...">
+            <button id="send-button">إرسال</button>
+        </footer>
+    </div>
 
-      // --- ربط عناصر الواجهة بالكود ---
-      const nameInput = document.getElementById('nameInput');
-      const messageInput = document.getElementById('messageInput');
-      const sendButton = document.getElementById('sendButton');
-      const chatbox = document.getElementById('chatbox');
+    <!-- تضمين Firebase SDK -->
+   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
 
-      // --- إعداد مرجع قاعدة البيانات ---
-      const messagesRef = ref(database, 'messages');
-
-      // --- وظيفة إرسال الرسالة ---
-      function sendMessage() {
-          const name = nameInput.value.trim();
-          const message = messageInput.value.trim();
-
-          if (name === '' || message === '') {
-              alert('يرجى إدخال اسمك ورسالتك!');
-              return;
-          }
-
-          const newMessage = {
-              name: name,
-              message: message,
-              timestamp: serverTimestamp() // استخدام وقت الخادم لدقة أفضل
-          };
-
-          // إرسال الرسالة إلى Firebase
-          push(messagesRef, newMessage)
-              .then(() => {
-                  // تم الإرسال بنجاح
-                  messageInput.value = ''; // مسح حقل الرسالة
-              })
-              .catch((error) => {
-                  console.error("خطأ في إرسال الرسالة: ", error);
-                  alert('حدث خطأ أثناء إرسال الرسالة.');
-              });
-      }
-
-      // --- ربط حدث النقر والضغط على Enter ---
-      sendButton.addEventListener('click', sendMessage);
-      messageInput.addEventListener('keypress', function(event) {
-          if (event.key === 'Enter') {
-              sendMessage();
-          }
-      });
-
-      // --- وظيفة عرض الرسالة ---
-      function displayMessage(key, data) {
-          const messageElement = document.createElement('div');
-          messageElement.classList.add('message');
-          messageElement.setAttribute('data-key', key); // إضافة مفتاح الرسالة كبيانات
-
-          const metaElement = document.createElement('div');
-          metaElement.classList.add('meta');
-
-          const senderElement = document.createElement('span');
-          senderElement.classList.add('sender');
-          senderElement.textContent = data.name;
-
-          const timeElement = document.createElement('span');
-          timeElement.classList.add('time');
-          // تنسيق الوقت (يمكن تحسينه أكثر)
-          timeElement.textContent = data.timestamp ? new Date(data.timestamp).toLocaleString('ar-EG') : '...';
-
-          metaElement.appendChild(senderElement);
-          metaElement.appendChild(timeElement);
-
-          const textElement = document.createElement('div');
-          textElement.classList.add('text');
-          // تعقيم بسيط للنص لمنع حقن HTML (يفضل استخدام مكتبة متخصصة للتعقيم في الإنتاج)
-          textElement.textContent = data.message;
-
-          messageElement.appendChild(metaElement);
-          messageElement.appendChild(textElement);
-
-          chatbox.appendChild(messageElement);
-      }
-
-      // --- الاستماع للرسائل الجديدة من Firebase ---
-      onValue(messagesRef, (snapshot) => {
-          chatbox.innerHTML = ''; // مسح الرسائل القديمة قبل عرض الجديدة
-          const messages = snapshot.val();
-          if (messages) {
-              Object.keys(messages).forEach((key) => {
-                  displayMessage(key, messages[key]);
-              });
-              // التمرير التلقائي للأسفل
-              chatbox.scrollTop = chatbox.scrollHeight;
-          } else {
-              chatbox.innerHTML = '<p class="system-message">لا توجد رسائل بعد. كن أول من يبدأ الحديث!</p>';
-          }
-      }, (error) => {
-        console.error("خطأ في قراءة البيانات: ", error);
-        chatbox.innerHTML = '<p class="system-message error">حدث خطأ في الاتصال بقاعدة البيانات.</p>';
-      });
-
-    </script>
-
+    <!-- تضمين ملف الجافاسكربت الخاص بنا -->
+    <script src="script.js"></script>
 </body>
 </html>
